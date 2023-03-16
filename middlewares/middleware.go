@@ -22,6 +22,11 @@ func NewMiddleware(method string, handlerFunc HandlerFunction) (*Middleware, err
 			Method:          "",
 			HandlerFunction: handlerFunc,
 		}, nil
+	case "digest":
+		return &Middleware{
+			Method:          "",
+			HandlerFunction: handlerFunc,
+		}, nil
 	default:
 		return nil, nil
 	}
