@@ -57,11 +57,15 @@ func (b *BasicConfig) BasicAuthentication(next http.HandlerFunc) http.HandlerFun
 		usernameMatch := subtle.ConstantTimeCompare(usernameHash[:], expectedUsernameHash[:])
 		passwordMatch := subtle.ConstantTimeCompare(passwordHash[:], expectedPasswordHash[:])
 
-		// if success, move on to the next handler
-		if usernameMatch == 1 && passwordMatch == 1 {
-			next.ServeHTTP(w, r)
+		// if one doesn't match, return unauthorized
+		if usernameMatch != 1 || passwordMatch != 1 {
+			w.Header().Set("WWW-Authenticate", `Basic realm="restricted", charset="UTF-8"`)
+			http.Error(w, "unauthorized", http.StatusUnauthorized)
 			return
-
 		}
+
+		// if success, move on to the next handler
+		next.ServeHTTP(w, r)
+		return
 	})
 }
